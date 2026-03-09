@@ -3,6 +3,7 @@ import { UserService } from '../../services/user-service';
 import { CommonModule, Location } from '@angular/common';
 import { DialogService } from '../../services/dialog-service';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { finalize, timer } from 'rxjs';
 @Component({
   selector: 'app-visit-page',
   imports: [CommonModule, ReactiveFormsModule],
@@ -17,7 +18,7 @@ export class VisitPage {
 
   characters = signal<any[]>([]);
   page = signal<number>(1);
-
+  loading = signal(true);
   selectedIndex = signal<number | null>(null);
 
   recordsToShow = signal<number>(10);
@@ -34,8 +35,14 @@ export class VisitPage {
 
       const currentPage = this.page();
 
+      this.loading.set(true);
+
       this.userService
-        .getCharacters(currentPage)
+        .getCharacters(currentPage).pipe(
+          finalize(() => {
+            timer(1000).subscribe(() => this.loading.set(false));
+          })
+        )
         .subscribe(res => {
 
           this.characters.set(res.results);
@@ -126,5 +133,14 @@ export class VisitPage {
   }
   goBack() {
     this.location.back();
+  }
+  prevPage() {
+    if (this.page() > 1) {
+      this.page.update(p => p - 1);
+    }
+  }
+
+  nextPage() {
+    this.page.update(p => p + 1);
   }
 }
