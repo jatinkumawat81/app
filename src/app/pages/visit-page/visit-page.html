@@ -1,0 +1,219 @@
+<div class="flex flex-col gap-6">
+  <div class="flex gap-4 items-center mt-6">
+    <svg
+      (click)="goBack()"
+      class="cursor-pointer"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+    >
+      <g clip-path="url(#clip0_2166_7464)">
+        <path
+          d="M20.2495 11.9995H3.74951"
+          stroke="#000"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M10.4995 5.24951L3.74951 11.9995L10.4995 18.7495"
+          stroke="#000"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_2166_7464">
+          <rect
+            width="24"
+            height="24"
+            fill="white"
+            transform="translate(-0.000488281 -0.000488281)"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+    <h2 class="text-2xl font-semibold text-gray-700">Characters List</h2>
+  </div>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <button
+        [disabled]="selectedIndex() === null"
+        class="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        (click)="editRow(editDialog)"
+      >
+        Edit
+      </button>
+
+      <button
+        [disabled]="selectedIndex() === null"
+        class="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        (click)="deleteRow()"
+      >
+        Delete
+      </button>
+
+      <button
+        [disabled]="selectedIndex() === null"
+        class="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-400 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        (click)="clearSelection()"
+      >
+        Clear
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-gray-600">Rows</span>
+
+      <select
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        (change)="changeRecords($any($event.target).value)"
+      >
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-gray-700">
+        <thead
+          class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"
+        >
+          <tr>
+            <th class="px-6 py-4 text-center"></th>
+            <th class="px-6 py-4 text-left">ID</th>
+            <th class="px-6 py-4 text-left">Name</th>
+            <th class="px-6 py-4 text-left">Gender</th>
+            <th class="px-6 py-4 text-left">Origin Name</th>
+            <th class="px-6 py-4 text-left">Location</th>
+            <th class="px-6 py-4 text-left">Created Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (
+            character of characters().slice(0, recordsToShow());
+            track $index
+          ) {
+            <tr class="hover:bg-gray-50 transition duration-150">
+              <td class="px-6 py-4 text-center">
+                <input
+                  type="radio"
+                  name="selectedCharacter"
+                  class="w-4 h-4 accent-blue-600 cursor-pointer"
+                  (change)="selectRow($index)"
+                  [checked]="selectedIndex() === $index"
+                />
+              </td>
+
+              <td class="px-6 py-4 font-medium text-gray-900">
+                {{ character.id }}
+              </td>
+
+              <td class="px-6 py-4">
+                {{ character.name }}
+              </td>
+
+              <td class="px-6 py-4">
+                {{ character.gender }}
+              </td>
+
+              <td class="px-6 py-4">
+                {{ character.origin.name }}
+              </td>
+
+              <td class="px-6 py-4">
+                {{ character.location.name }}
+              </td>
+
+              <td class="px-6 py-4">
+                {{ character.created | date: "yyyy-MM-dd" }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ng-template #editDialog>
+  <div class="p-6 w-[400px]">
+    <form [formGroup]="editForm" class="flex flex-col gap-4">
+      <h2 class="text-lg font-semibold text-gray-700">Edit Character</h2>
+
+      <div>
+        <label class="text-sm text-gray-600">Name</label>
+
+        <input
+          formControlName="name"
+          class="w-full border rounded-lg px-3 py-2 mt-1"
+        />
+
+        @if (editForm.controls.name.touched && editForm.controls.name.invalid) {
+          <p class="text-red-500 text-xs mt-1">
+            Name is required (min 3 characters)
+          </p>
+        }
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600">Gender</label>
+
+        <input
+          formControlName="gender"
+          class="w-full border rounded-lg px-3 py-2 mt-1"
+        />
+
+        @if (
+          editForm.controls.gender.touched && editForm.controls.gender.invalid
+        ) {
+          <p class="text-red-500 text-xs mt-1">Gender is required</p>
+        }
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600">Location</label>
+
+        <input
+          formControlName="location"
+          class="w-full border rounded-lg px-3 py-2 mt-1"
+        />
+
+        @if (
+          editForm.controls.location.touched &&
+          editForm.controls.location.invalid
+        ) {
+          <p class="text-red-500 text-xs mt-1">Location is required</p>
+        }
+      </div>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button
+          type="button"
+          class="px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-100"
+          (click)="dialogService.closeAllDialogs()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          [disabled]="editForm.invalid"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition"
+          (click)="saveEdit()"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
