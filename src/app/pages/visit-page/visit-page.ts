@@ -32,11 +32,8 @@ export class VisitPage {
   constructor() {
 
     effect(() => {
-
       const currentPage = this.page();
-
       this.loading.set(true);
-
       this.userService
         .getCharacters(currentPage).pipe(
           finalize(() => {
@@ -44,11 +41,8 @@ export class VisitPage {
           })
         )
         .subscribe(res => {
-
           this.characters.set(res.results);
-
         });
-
     });
 
   }
@@ -63,18 +57,12 @@ export class VisitPage {
 
   deleteRow() {
     this.dialogService.openConfirmDeleteDialog().afterClosed().subscribe(result => {
-
       if (result) {
         const index = this.selectedIndex();
-
         if (index === null) return;
-
         const updated = [...this.characters()];
-
         updated.splice(index, 1);
-
         this.characters.set(updated);
-
         this.selectedIndex.set(null);
       }
 
@@ -83,35 +71,25 @@ export class VisitPage {
   }
 
   editRow(template: any) {
-
     const index = this.selectedIndex();
-
     if (index === null) return;
-
     const character = this.characters()[index];
-
     this.editForm.patchValue({
       name: character.name,
       gender: character.gender,
       location: character.location.name
     });
-
     this.dialogService.openTemplateDialog(template);
-
   }
-  saveEdit() {
 
+  saveEdit() {
     if (this.editForm.invalid) {
       this.editForm.markAllAsTouched();
       return;
     }
-
     const index = this.selectedIndex();
-
     if (index === null) return;
-
     const updated = [...this.characters()];
-
     updated[index] = {
       ...updated[index],
       name: this.editForm.value.name,
@@ -121,11 +99,8 @@ export class VisitPage {
         name: this.editForm.value.location
       }
     };
-
     this.characters.set(updated);
-
     this.dialogService.closeAllDialogs();
-
   }
 
   changeRecords(count: number) {
